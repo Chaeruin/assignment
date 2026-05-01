@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,7 +21,15 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "issued_coupons")
+@Table(
+        name = "issued_coupon",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_coupon_id_user_id",
+                        columnNames = {"coupon_id", "user_id"}
+                )
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IssuedCoupon {
 

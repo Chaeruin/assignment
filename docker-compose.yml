@@ -42,6 +42,10 @@ services:
       - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_BROKER_ID=0
+      # 운영 환경용 추가 환경 변수
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3  # 가용성을 위해 복제본 3개 설정
+      - KAFKA_CFG_NUM_PARTITIONS=3            # 처리량을 위해 파티션 분할
     volumes:
       - kafka_data:/bitnami/kafka
     networks:

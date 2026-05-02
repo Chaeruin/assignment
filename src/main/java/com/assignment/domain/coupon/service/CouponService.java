@@ -1,14 +1,18 @@
 package com.assignment.domain.coupon.service;
 
+import com.assignment.domain.coupon.dto.response.CouponResponse;
 import com.assignment.domain.coupon.dto.response.IssuedCouponResponse;
+import com.assignment.domain.coupon.entity.Coupon;
 import com.assignment.domain.coupon.entity.CouponUsageHistory;
 import com.assignment.domain.coupon.entity.IssuedCoupon;
 import com.assignment.domain.coupon.enums.IssuedCouponStatus;
+import com.assignment.domain.coupon.repository.CouponRepository;
 import com.assignment.domain.coupon.repository.CouponUsageHistoryRepository;
 import com.assignment.domain.coupon.repository.IssuedCouponRepository;
 import com.assignment.global.exception.CouponException;
 import com.assignment.global.exception.ErrorCode;
 import com.assignment.global.exception.UnauthorizedException;
+import com.assignment.global.infrastructure.redis.RedisCouponRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,8 @@ public class CouponService {
 
     private final IssuedCouponRepository issuedCouponRepository;
     private final CouponUsageHistoryRepository usageHistoryRepository;
+    private final CouponRepository couponRepository;
+    private final RedisCouponRepository redisCouponRepository;
 
     // 사용자 보유 모든 쿠폰 목록
     public List<IssuedCouponResponse> getMyCoupons(Long userId) {
@@ -33,6 +39,25 @@ public class CouponService {
     public List<IssuedCouponResponse> getUsableCoupons(Long userId) {
         return issuedCouponRepository.findAllByUserIdAndStatus(userId, IssuedCouponStatus.ISSUED).stream()
                 .map(IssuedCouponResponse::from)
+                .toList();
+    }
+
+    // 잔여 수량 조회
+    public Integer getCouponStock(Long couponId) {
+        Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
+
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
+
+        // 비즈니스 로직(잔여량 계산) 수행
+        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
+    }
+
+    // 발급 가능한 쿠폰 목록 조회
+    public List<CouponResponse> getAvailableCoupons() {
+        // 현재 날짜 기준으로 발급 기간 내에 있고, 삭제되지 않은 쿠폰 조회
+        return couponRepository.findAllByIsDisplayTrue().stream()
+                .map(CouponResponse::from)
                 .toList();
     }
 

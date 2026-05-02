@@ -3,6 +3,8 @@ package com.assignment.domain.coupon.entity;
 
 import com.assignment.domain.coupon.enums.CouponStatus;
 import com.assignment.domain.coupon.enums.CouponType;
+import com.assignment.global.exception.CouponException;
+import com.assignment.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,4 +63,11 @@ public class Coupon {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
+    public void increaseIssuedQuantity() {
+        if (this.issuedQuantity >= this.totalQuantity) {
+            this.status = CouponStatus.EXHAUSTED;
+            throw new CouponException(ErrorCode.COUPON_EXHAUSTED_EXCEPTION);
+        }
+        this.issuedQuantity++;
+    }
 }

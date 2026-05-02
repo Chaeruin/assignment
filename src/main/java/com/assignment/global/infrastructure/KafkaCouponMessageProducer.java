@@ -1,5 +1,6 @@
 package com.assignment.global.infrastructure;
 
+import com.assignment.domain.coupon.producer.CouponMessageProducer;
 import com.assignment.global.event.CouponIssueEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

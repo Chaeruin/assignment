@@ -18,4 +18,15 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(e.getHttpStatus()).body(response);
     }
+
+    @ExceptionHandler(CouponException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthorizedException(UnauthorizedException e) {
+        log.info(e.getMessage(), e);
+        ApiResponse<Void> response = ApiResponse.fail(
+                e.getMessage()
+        );
+        return ResponseEntity.status(e.getHttpStatus()).body(response);
+    }
 }
+
+

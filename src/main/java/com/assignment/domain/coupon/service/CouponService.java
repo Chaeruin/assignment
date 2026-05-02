@@ -8,6 +8,7 @@ import com.assignment.domain.coupon.repository.CouponUsageHistoryRepository;
 import com.assignment.domain.coupon.repository.IssuedCouponRepository;
 import com.assignment.global.exception.CouponException;
 import com.assignment.global.exception.ErrorCode;
+import com.assignment.global.exception.UnauthorizedException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,9 @@ public class CouponService {
         IssuedCoupon issuedCoupon = issuedCouponRepository.findById(issuedCouponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
-        // 본인 확인 및 상태 검증
+        // 본인 확인 및 발급 상태 검증
         if (!issuedCoupon.getUserId().equals(userId))
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_EXCEPTION);
         if (issuedCoupon.getStatus() != IssuedCouponStatus.ISSUED)
             throw new CouponException(ErrorCode.COUPON_NOT_AVAILABLE_EXCEPTION);
 

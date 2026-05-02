@@ -1,4 +1,4 @@
-package com.assignment.global.infrastructure;
+package com.assignment.global.infrastructure.kafka;
 
 import com.assignment.domain.coupon.producer.CouponMessageProducer;
 import com.assignment.global.event.CouponIssueEvent;

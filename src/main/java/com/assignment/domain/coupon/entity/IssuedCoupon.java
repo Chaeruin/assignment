@@ -64,4 +64,9 @@ public class IssuedCoupon {
         this.issuedAt = LocalDateTime.now();
         this.expiredAt = this.issuedAt.plusDays(coupon.getValidDays());
     }
+
+    public void use() {
+        this.status = IssuedCouponStatus.USED;
+        this.usedAt = LocalDateTime.now();
+    }
 }

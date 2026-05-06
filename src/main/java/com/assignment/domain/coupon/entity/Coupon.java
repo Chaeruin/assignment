@@ -3,6 +3,7 @@ package com.assignment.domain.coupon.entity;
 
 import com.assignment.domain.coupon.enums.CouponStatus;
 import com.assignment.domain.coupon.enums.CouponType;
+import com.assignment.domain.coupon.enums.IssuedCouponStatus;
 import com.assignment.global.exception.CouponException;
 import com.assignment.global.exception.ErrorCode;
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -63,11 +65,18 @@ public class Coupon {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    public void increaseIssuedQuantity() {
-        if (this.issuedQuantity >= this.totalQuantity) {
-            this.status = CouponStatus.EXHAUSTED;
-        }
-        this.issuedQuantity++;
+    @Builder
+    public Coupon(String name, CouponType couponType, CouponStatus couponStatus, Integer discountValue,
+                  Integer totalQuantity, Integer validDays) {
+        this.name = name;
+        this.couponType = couponType;
+        this.status = couponStatus;
+        this.discountValue = discountValue;
+        this.totalQuantity = totalQuantity;
+        this.validDays = validDays;
+        this.startDate = LocalDateTime.now();
+        this.endDate = this.startDate.plusDays(validDays);
+
     }
 
     public void updateTotalQuantity(int quantity) {

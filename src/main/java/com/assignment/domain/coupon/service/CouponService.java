@@ -1,5 +1,6 @@
 package com.assignment.domain.coupon.service;
 
+import com.assignment.domain.coupon.dto.response.CouponQuantityResponse;
 import com.assignment.domain.coupon.dto.response.CouponResponse;
 import com.assignment.domain.coupon.dto.response.IssuedCouponResponse;
 import com.assignment.domain.coupon.entity.Coupon;
@@ -43,14 +44,15 @@ public class CouponService {
     }
 
     // 잔여 수량 조회
-    public Integer getCouponStock(Long couponId) {
-        Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
+    public CouponQuantityResponse getCouponStock(Long couponId) {
+        int issuedCount = redisCouponRepository.getIssuedCount(couponId);
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
         // 비즈니스 로직(잔여량 계산) 수행
-        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
+        int quantity = Math.max(coupon.getTotalQuantity() - issuedCount, 0);
+        return new CouponQuantityResponse(quantity);
     }
 
     // 발급 가능한 쿠폰 목록 조회

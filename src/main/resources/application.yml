@@ -41,5 +41,6 @@ spring:
 
 logging:
   level:
+    org.springframework.web: DEBUG
     org.hibernate.SQL: debug
     org.springframework.kafka: info

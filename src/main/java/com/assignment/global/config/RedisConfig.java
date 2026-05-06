@@ -23,7 +23,7 @@ public class RedisConfig {
     @Bean
     public DefaultRedisScript<Long> issueCouponScript() {
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setLocation(new ClassPathResource("scripts/issueCoupon.lua"));
+        script.setLocation(new ClassPathResource("scripts/issuedCoupon.lua"));
         script.setResultType(Long.class);
         return script;
     }

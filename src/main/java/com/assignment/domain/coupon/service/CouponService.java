@@ -45,15 +45,14 @@ public class CouponService {
     }
 
     // 잔여 수량 조회
-    public CouponQuantityResponse getCouponStock(Long couponId) {
+    public Integer getCouponStock(Long couponId) {
         int issuedCount = redisCouponRepository.getIssuedCount(couponId);
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
         // 비즈니스 로직(잔여량 계산) 수행
-        int quantity = Math.max(coupon.getTotalQuantity() - issuedCount, 0);
-        return new CouponQuantityResponse(quantity);
+        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
     }
 
     // 발급 가능한 쿠폰 목록 조회
@@ -87,6 +86,25 @@ public class CouponService {
                 .build();
 
         usageHistoryRepository.save(history);
+    }
+
+    public int resetStock(Long couponId) {
+        // 해당 쿠폰의 발급 내역 삭제 (DELETE)
+        // 재고 테이블의 수량을 100개(임의 설정)로 UPDATE
+
+        // 쿠폰 존재 확인
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
+
+        // 해당 쿠폰의 모든 발급 이력 삭제
+        // 테스트용 초기화 - Hard Delete 진행
+        issuedCouponRepository.deleteAllByCouponId(couponId);
+
+        // 재고 수량 업데이트
+        coupon.updateTotalQuantity(100);
+        couponRepository.save(coupon);
+
+        return coupon.getTotalQuantity();
     }
 
     private Integer calculateDiscount(IssuedCoupon issuedCoupon) {

@@ -43,9 +43,9 @@ public class CouponController {
 
     // 잔여 수량 조회
     @GetMapping("/{couponId}/stock")
-    public ResponseEntity<ApiResponse<CouponQuantityResponse>> getCouponStock(@PathVariable Long couponId) {
-        CouponQuantityResponse response = couponService.getCouponStock(couponId);
-        return ResponseEntity.ok(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<Integer>> getCouponStock(@PathVariable Long couponId) {
+        Integer stock = couponService.getCouponStock(couponId);
+        return ResponseEntity.ok(ApiResponse.success(stock));
     }
 
     // 사용자 보유 쿠폰 목록 조회 API
@@ -76,5 +76,16 @@ public class CouponController {
 
         couponService.useCoupon(issuedCouponId, request.userId(), request.orderId());
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // 프론트 코드 맞춤 추가
+    // 재고 초기화 API
+    // Mysql 컨테이너에서 직접 설정 대신 백엔드에서 접근, 초기화
+    @PostMapping("/{couponId}/stock/init")
+    public ResponseEntity<ApiResponse<Integer>> initStock(
+            @PathVariable Long couponId
+    ) {
+        int restoredStock = couponService.resetStock(couponId);
+        return ResponseEntity.ok(ApiResponse.success(restoredStock));
     }
 }

@@ -70,4 +70,8 @@ public class Coupon {
         }
         this.issuedQuantity++;
     }
+
+    public void updateTotalQuantity(int quantity) {
+        this.totalQuantity = quantity;
+    }
 }

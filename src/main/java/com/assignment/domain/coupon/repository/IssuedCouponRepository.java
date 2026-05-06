@@ -14,4 +14,6 @@ public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long
             @Param("userId") Long userId,
             @Param("status") IssuedCouponStatus status
     );
+
+    void deleteAllByCouponId(Long couponId);
 }

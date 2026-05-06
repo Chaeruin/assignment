@@ -37,7 +37,8 @@ public class CouponController {
 
         couponIssueService.issue(couponId, request.userId());
 
-        return ResponseEntity.ok(ApiResponse.success(null));
+        return ResponseEntity.accepted()
+                .body(ApiResponse.success(null));
     }
 
     // 잔여 수량 조회

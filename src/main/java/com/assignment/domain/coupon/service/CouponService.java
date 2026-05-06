@@ -1,6 +1,5 @@
 package com.assignment.domain.coupon.service;
 
-import com.assignment.domain.coupon.dto.response.CouponQuantityResponse;
 import com.assignment.domain.coupon.dto.response.CouponResponse;
 import com.assignment.domain.coupon.dto.response.IssuedCouponResponse;
 import com.assignment.domain.coupon.entity.Coupon;
@@ -17,9 +16,11 @@ import com.assignment.global.infrastructure.redis.RedisCouponRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CouponService {
@@ -45,13 +46,21 @@ public class CouponService {
 
     // 잔여 수량 조회
     public Integer getCouponStock(Long couponId) {
-        Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
-        if (issuedCount == null) issuedCount = 0;
+        Integer redisStock = redisCouponRepository.getRemainingStock(couponId);
+        if (redisStock != null) {
+            return Math.max(redisStock, 0);
+        }
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
-        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
+        int total = coupon.getTotalQuantity();
+        int issued = coupon.getIssuedQuantity();
+
+        log.info("[재고조회] CouponID: {}, Total: {}, Issued: {}", couponId, total, issued);
+
+        int stock = total - issued;
+        return Math.max(stock, 0);
     }
 
     // 발급 가능한 쿠폰 목록 조회
@@ -103,6 +112,7 @@ public class CouponService {
 
         // 재고 수량 업데이트
         coupon.updateTotalQuantity(100);
+        coupon.updateIssuedQuantity(0);
         couponRepository.save(coupon);
 
         return coupon.getTotalQuantity();

@@ -38,6 +38,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+      consumer:
+        # 한 번에 최대 몇 개까지 모아서 가져올지 설정 (예: 100개)
+        max-poll-records: 100
+      listener:
+        # 리스너 타입을 batch로 명시
+        type: batch
 
 logging:
   level:

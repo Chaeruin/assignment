@@ -10,9 +10,9 @@ public class RedisCouponRepository {
     private final RedisTemplate<String, String> redisTemplate;
     private static final String STOCK_KEY_PREFIX = "coupon:stock:";
 
-    public Integer getIssuedCount(Long couponId) {
+    public Integer getRemainingStock(Long couponId) {
         String countStr = redisTemplate.opsForValue().get(STOCK_KEY_PREFIX + couponId);
-        return (countStr != null) ? Integer.parseInt(countStr) : 0;
+        return (countStr != null) ? Integer.parseInt(countStr) : null;
     }
 
     public void resetRedisIssuedCount(Long couponId) {

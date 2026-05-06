@@ -66,12 +66,15 @@ public class Coupon {
     public void increaseIssuedQuantity() {
         if (this.issuedQuantity >= this.totalQuantity) {
             this.status = CouponStatus.EXHAUSTED;
-            throw new CouponException(ErrorCode.COUPON_EXHAUSTED_EXCEPTION);
         }
         this.issuedQuantity++;
     }
 
     public void updateTotalQuantity(int quantity) {
         this.totalQuantity = quantity;
+    }
+
+    public void updateIssuedQuantity(int quantity) {
+        this.issuedQuantity = quantity;
     }
 }

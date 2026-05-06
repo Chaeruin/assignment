@@ -5,10 +5,9 @@ import com.assignment.domain.coupon.entity.IssuedCoupon;
 import com.assignment.domain.coupon.repository.CouponRepository;
 import com.assignment.domain.coupon.repository.IssuedCouponRepository;
 import com.assignment.global.event.CouponIssueEvent;
-import com.assignment.global.exception.CouponException;
-import com.assignment.global.exception.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +29,7 @@ public class CouponIssueConsumer {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
     private final ObjectMapper objectMapper;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @RetryableTopic(
             attempts = "3",         // 총 3번 시도 (최초 1회 + 재시도 2회)
@@ -44,19 +44,20 @@ public class CouponIssueConsumer {
         try {
             CouponIssueEvent event = objectMapper.readValue(message, CouponIssueEvent.class);
 
-            Coupon coupon = couponRepository.findById(event.couponId())
-                    .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
-
-            // DB 수량 업데이트
-            coupon.increaseIssuedQuantity();
-
             // 발급 이력 저장
-            IssuedCoupon issuedCoupon = new IssuedCoupon(coupon, event.userId());
+            Coupon coupon = couponRepository.getReferenceById(event.couponId());
+            issuedCouponRepository.save(new IssuedCoupon(coupon, event.userId()));
 
-            issuedCouponRepository.save(issuedCoupon);
+            // Redis 값을 읽어 DB 수량 업데이트 (정합성 보장 핵심)
+            String userKey = "coupon:issued:user:" + event.couponId();
+            Long currentRedisCount = redisTemplate.opsForSet().size(userKey);
+
+            if (currentRedisCount != null) {
+                couponRepository.updateIssuedQuantity(event.couponId(), currentRedisCount.intValue());
+            }
 
         } catch (JsonProcessingException e) {
-            log.error("메시지 파싱 실패 (재시도 하지 않음): {}", message);
+            log.error("메시지 파싱 실패 (재시도 하지 않음): {}", e.getMessage());
             throw new RuntimeException(e); // 필요시 별도 예외 처리
         }
     }

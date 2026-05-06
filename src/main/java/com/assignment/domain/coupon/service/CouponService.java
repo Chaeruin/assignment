@@ -44,14 +44,14 @@ public class CouponService {
     }
 
     // 잔여 수량 조회
-    public CouponQuantityResponse getCouponStock(Long couponId) {
+    public Integer getCouponStock(Long couponId) {
         Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
         if (issuedCount == null) issuedCount = 0;
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
-        return new CouponQuantityResponse(Math.max(coupon.getTotalQuantity() - issuedCount, 0));
+        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
     }
 
     // 발급 가능한 쿠폰 목록 조회

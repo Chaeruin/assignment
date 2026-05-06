@@ -14,6 +14,7 @@ import com.assignment.global.exception.CouponException;
 import com.assignment.global.exception.ErrorCode;
 import com.assignment.global.exception.UnauthorizedException;
 import com.assignment.global.infrastructure.redis.RedisCouponRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,7 +59,7 @@ public class CouponService {
     // 발급 가능한 쿠폰 목록 조회
     public List<CouponResponse> getAvailableCoupons() {
         // 현재 날짜 기준으로 발급 기간 내에 있고, 삭제되지 않은 쿠폰 조회
-        return couponRepository.findAllByIsDisplayTrue().stream()
+        return couponRepository.findAllByEndDateAfter(LocalDateTime.now()).stream()
                 .map(CouponResponse::from)
                 .toList();
     }

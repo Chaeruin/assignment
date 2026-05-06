@@ -94,7 +94,7 @@ public class CouponService {
 
         // 쿠폰 존재 확인
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다."));
+                .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
         // 해당 쿠폰의 모든 발급 이력 삭제
         // 테스트용 초기화 - Hard Delete 진행

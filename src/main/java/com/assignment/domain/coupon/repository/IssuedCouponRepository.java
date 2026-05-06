@@ -4,6 +4,8 @@ import com.assignment.domain.coupon.entity.IssuedCoupon;
 import com.assignment.domain.coupon.enums.IssuedCouponStatus;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long> {
@@ -15,5 +17,7 @@ public interface IssuedCouponRepository extends JpaRepository<IssuedCoupon, Long
             @Param("status") IssuedCouponStatus status
     );
 
+    @Modifying
+    @Query("DELETE FROM IssuedCoupon c WHERE c.coupon.id = :couponId")
     void deleteAllByCouponId(Long couponId);
 }

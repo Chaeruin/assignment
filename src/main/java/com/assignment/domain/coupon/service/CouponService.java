@@ -46,7 +46,8 @@ public class CouponService {
 
     // 잔여 수량 조회
     public Integer getCouponStock(Long couponId) {
-        int issuedCount = redisCouponRepository.getIssuedCount(couponId);
+        Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
+        if (issuedCount == null) issuedCount = 0;
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
@@ -99,6 +100,7 @@ public class CouponService {
         // 해당 쿠폰의 모든 발급 이력 삭제
         // 테스트용 초기화 - Hard Delete 진행
         issuedCouponRepository.deleteAllByCouponId(couponId);
+        redisCouponRepository.resetRedisIssuedCount(couponId);
 
         // 재고 수량 업데이트
         coupon.updateTotalQuantity(100);

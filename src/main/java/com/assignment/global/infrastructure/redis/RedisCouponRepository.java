@@ -14,4 +14,9 @@ public class RedisCouponRepository {
         String countStr = redisTemplate.opsForValue().get(STOCK_KEY_PREFIX + couponId);
         return (countStr != null) ? Integer.parseInt(countStr) : 0;
     }
+
+    public void resetRedisIssuedCount(Long couponId) {
+        String redisKey = STOCK_KEY_PREFIX + couponId;
+        redisTemplate.delete(redisKey);
+    }
 }

@@ -1,6 +1,9 @@
-local stock_key = "coupon:stock:" .. ARGV[1]
-local user_key = "coupon:issued:user:" .. ARGV[1]
+local coupon_id = ARGV[1]
+local user_id = ARGV[2]
 local total_quantity = tonumber(ARGV[3])
+
+local stock_key = "coupon:stock:" .. coupon_id
+local user_key = "coupon:issued:user:" .. coupon_id
 
 -- [중요] Redis에 데이터가 없으면 DB에서 가져온 수량으로 초기화 (최초 1회)
 if redis.call("EXISTS", stock_key) == 0 then

@@ -43,9 +43,9 @@ public class CouponController {
 
     // 잔여 수량 조회
     @GetMapping("/{couponId}/stock")
-    public ResponseEntity<ApiResponse<Integer>> getCouponStock(@PathVariable Long couponId) {
-        Integer stock = couponService.getCouponStock(couponId);
-        return ResponseEntity.ok(ApiResponse.success(stock));
+    public ResponseEntity<ApiResponse<CouponQuantityResponse>> getCouponStock(@PathVariable Long couponId) {
+        CouponQuantityResponse response = couponService.getCouponStock(couponId);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     // 사용자 보유 쿠폰 목록 조회 API

@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CouponService {
 
     private final IssuedCouponRepository issuedCouponRepository;
@@ -45,15 +44,14 @@ public class CouponService {
     }
 
     // 잔여 수량 조회
-    public Integer getCouponStock(Long couponId) {
+    public CouponQuantityResponse getCouponStock(Long couponId) {
         Integer issuedCount = redisCouponRepository.getIssuedCount(couponId);
         if (issuedCount == null) issuedCount = 0;
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new CouponException(ErrorCode.COUPON_NOT_FOUND_EXCEPTION));
 
-        // 비즈니스 로직(잔여량 계산) 수행
-        return Math.max(coupon.getTotalQuantity() - issuedCount, 0);
+        return new CouponQuantityResponse(Math.max(coupon.getTotalQuantity() - issuedCount, 0));
     }
 
     // 발급 가능한 쿠폰 목록 조회
@@ -89,6 +87,7 @@ public class CouponService {
         usageHistoryRepository.save(history);
     }
 
+    @Transactional
     public int resetStock(Long couponId) {
         // 해당 쿠폰의 발급 내역 삭제 (DELETE)
         // 재고 테이블의 수량을 100개(임의 설정)로 UPDATE

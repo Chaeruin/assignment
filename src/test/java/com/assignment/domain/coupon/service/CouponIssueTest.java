@@ -84,6 +84,7 @@ class CouponIssueTest {
         redisTemplate.opsForValue().set(stockKey, String.valueOf(totalQuantity));
         // 유저 초기화
         redisTemplate.delete(userKey);
+        issuedCouponRepository.deleteAllInBatch();
     }
 
     @Test
